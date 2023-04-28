@@ -1170,7 +1170,12 @@ func (e *EthEvent) installEthFilterSpec(ctx context.Context, filterSpec *ethtype
 			return nil, xerrors.Errorf("must not specify block hash and from/to block")
 		}
 
-		// TODO: derive a tipset hash from eth hash - might need to push this down into the EventFilterManager
+		ts, err := e.Chain.GetTipSetByCid(ctx, filterSpec.BlockHash.ToCid())
+		if err != nil {
+			return nil, xerrors.Errorf("error loading tipset %s: %w", ts, err)
+		}
+		minHeight = ts.Height()
+		maxHeight = ts.Height()
 	} else {
 		if filterSpec.FromBlock == nil || *filterSpec.FromBlock == "latest" {
 			ts := e.Chain.GetHeaviestTipSet()
