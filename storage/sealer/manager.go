@@ -142,8 +142,17 @@ func New(ctx context.Context, lstor *paths.Local, stor paths.Store, ls paths.Loc
 	go m.sched.runSched()
 
 	localTasks := []sealtasks.TaskType{
-		sealtasks.TTCommit1, sealtasks.TTProveReplicaUpdate1, sealtasks.TTFinalize, sealtasks.TTFetch, sealtasks.TTFinalizeUnsealed, sealtasks.TTFinalizeReplicaUpdate,
+		sealtasks.TTCommit1, sealtasks.TTProveReplicaUpdate1, sealtasks.TTFetch,
 	}
+	
+	
+	//spit worker by cheergo
+	if val, ok := os.LookupEnv("LOTUS_DISABLE_FINALIZE"); ok && (val == "true" || val == "1") {
+		log.Warnf("This will disable finalize.")
+	} else {
+		localTasks = append(localTasks, sealtasks.TTFinalize, sealtasks.TTFinalizeUnsealed, sealtasks.TTFinalizeReplicaUpdate)
+	}
+	
 	if sc.AllowSectorDownload {
 		localTasks = append(localTasks, sealtasks.TTDownloadSector)
 	}

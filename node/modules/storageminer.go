@@ -320,6 +320,13 @@ func WindowPostScheduler(fc config.MinerFeeConfig, pc config.ProvingConfig) func
 		if err != nil {
 			return nil, err
 		}
+		
+		//split miner by cheergo
+		if val, ok := os.LookupEnv("LOTUS_DISABLE_WINDOWPOST"); ok && (val == "true" || val == "1") {
+		     log.Warnf("This miner will disable windowPoSt.")
+		     return fps, nil
+		}
+		
 
 		lc.Append(fx.Hook{
 			OnStart: func(context.Context) error {
@@ -496,6 +503,12 @@ func SetupBlockProducer(lc fx.Lifecycle, ds dtypes.MetadataDS, api v1api.FullNod
 	}
 
 	m := lotusminer.NewMiner(api, epp, minerAddr, sf, j)
+	
+	//spit miner by cheergo
+	if val, ok := os.LookupEnv("LOTUS_DISABLE_WINNINGPOST"); ok && (val == "true" || val == "1") {
+	    log.Warnf("This miner will disable minning block function.")
+	    return m, nil
+	}
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
