@@ -3,6 +3,7 @@ package paths
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math/bits"
 	"math/rand"
 	"os"
@@ -743,6 +744,9 @@ func (st *Local) FsStat(ctx context.Context, id storiface.ID) (fsutil.FsStat, er
 
 	p, ok := st.paths[id]
 	if !ok {
+
+		log.Warn(fmt.Sprintf("Local.FsStat SectorId=[%d],st.paths Size=[%s]",id, len(st.paths)))
+
 		return fsutil.FsStat{}, errPathNotFound
 	}
 
